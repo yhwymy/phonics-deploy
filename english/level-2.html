@@ -687,12 +687,20 @@ function edgeConnect(){
       resolve(ws);
     };
     ws.onerror = ()=>{ reject(new Error('edge-ws-error')); };
-    ws.onclose = ()=>{ edgeWs = null; };
+    ws.onclose = ()=>{
+      edgeWs = null;
+      // 连接意外断开且还有未完成任务时立即失败，避免干等 8 秒超时
+      const job = edgeJob;
+      if(job){ edgeJob = null; clearTimeout(job.timer); job.reject(new Error('edge-ws-closed')); }
+    };
     ws.onmessage = (ev)=>{
       if(typeof ev.data === 'string'){
         if(ev.data.indexOf('turn.end')>=0){
-          const job = edgeJob; edgeJob = null;
-          if(job){
+          // 按 X-RequestId 匹配当前任务，防止旧请求的结束帧误触发新任务
+          const job = edgeJob;
+          const rid = (ev.data.match(/X-RequestId:\s*(\S+)/i)||[])[1];
+          if(job && rid === job.rid){
+            edgeJob = null;
             clearTimeout(job.timer);
             const blob = new Blob(edgeChunks, {type:'audio/mpeg'});
             edgeChunks = [];
@@ -707,7 +715,10 @@ function edgeConnect(){
       if(buf.length < 2+hlen) return;
       try{
         const h = JSON.parse(new TextDecoder().decode(buf.slice(2, 2+hlen)));
-        if(h.type === 'audio' && 2+hlen < buf.length) edgeChunks.push(buf.slice(2+hlen));
+        // 只收集当前任务对应的音频数据，防止并发请求数据串扰
+        if(h.type === 'audio' && 2+hlen < buf.length && edgeJob && h.requestId === edgeJob.rid){
+          edgeChunks.push(buf.slice(2+hlen));
+        }
       }catch(e){}
     };
   });
@@ -715,8 +726,10 @@ function edgeConnect(){
 function edgeSpeak(text){
   return new Promise((resolve, reject)=>{
     edgeConnect().then(ws=>{
+      if(ws.readyState !== WebSocket.OPEN){ reject(new Error('edge-ws-closed')); return; }
+      const rid = uuid();
       edgeChunks = [];
-      const job = {resolve, reject, timer:null};
+      const job = {resolve, reject, timer:null, rid:rid};
       edgeJob = job;
       job.timer = setTimeout(()=>{          // 8 秒拿不到音频视为失败
         if(edgeJob===job){ edgeJob=null; reject(new Error('edge-timeout')); }
@@ -724,8 +737,10 @@ function edgeSpeak(text){
       const ssml = "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='en-US'><voice name='"
         + settings.edgeVoice + "'><prosody pitch='+0Hz' rate='" + Math.round((settings.rate-1)*100)
         + "%' volume='+0%'>" + escXml(text) + "</prosody></voice></speak>";
-      ws.send('X-RequestId:'+uuid()+'\r\nContent-Type:application/ssml+xml\r\nX-Timestamp:'
-        + new Date().toUTCString() + '\r\nPath:ssml\r\n\r\n' + ssml);
+      try{
+        ws.send('X-RequestId:'+rid+'\r\nContent-Type:application/ssml+xml\r\nX-Timestamp:'
+          + new Date().toUTCString() + '\r\nPath:ssml\r\n\r\n' + ssml);
+      }catch(e){ reject(e); }
     }).catch(reject);
   });
 }
@@ -735,6 +750,8 @@ let playToken = 0, edgeAudio = null, allPlaying = false;
 function stopSpeak(){
   playToken++;
   allPlaying = false;
+  if(edgeJob){ clearTimeout(edgeJob.timer); edgeJob = null; }
+  edgeChunks = [];
   if(edgeAudio){ try{ edgeAudio.pause(); }catch(e){} edgeAudio = null; }
   if('speechSynthesis' in window) speechSynthesis.cancel();
   document.querySelectorAll('.s-card.speaking').forEach(el=>el.classList.remove('speaking'));
