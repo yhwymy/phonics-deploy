@@ -315,6 +315,9 @@
       <div class="set-row">
         <span class="set-hint">💡 在线语音是微软神经网络语音（接近真人），需联网；连不上时会自动改用本地语音</span>
       </div>
+      <div class="set-row" id="iosHint" style="display:none;">
+        <span class="set-hint" style="color:#FF6B6B;">📱 当前是 iOS 设备：在线语音连不上，已自动使用系统语音，直接点句子就能听</span>
+      </div>
     </div>
     <div class="chips" id="chips"></div>
   </div>
@@ -594,6 +597,9 @@ const EDGE_VOICES = [
 ];
 
 let settings = { mode:'online', edgeVoice:'en-US-JennyNeural', localVoice:'', rate:0.9 };
+// iOS 检测：iPhone/iPad，以及新版 iPadOS（UA 伪装成 Mac）
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+if(isIOS) settings.mode = 'local';   // iOS 连不上微软在线语音，强制用系统语音
 try{ const s = JSON.parse(localStorage.getItem('kids200_voice')); if(s) settings = Object.assign(settings, s); }catch(e){}
 
 const settingsBtn = $('settingsBtn'), settingsPanel = $('settingsPanel');
@@ -635,6 +641,7 @@ function fillVoiceSelect(){
   }
 }
 function setMode(mode){
+  if(isIOS && mode==='online'){ showToast('⚠️ iOS 设备用不了在线语音，已使用系统语音'); return; }
   settings.mode = mode;
   modeOnline.classList.toggle('active', mode==='online');
   modeLocal.classList.toggle('active', mode==='local');
@@ -658,13 +665,18 @@ rateRange.addEventListener('input', ()=>{
 settingsBtn.addEventListener('click', ()=>{
   settingsPanel.classList.toggle('open');
   settingsBtn.classList.toggle('on', settingsPanel.classList.contains('open'));
+  const ih = $('iosHint'); if(ih) ih.style.display = isIOS ? '' : 'none';
   fillVoiceSelect();
 });
 $('tryBtn').addEventListener('click', ()=>{
   stopSpeak();
   playText('Hello! How are you today?', ()=>{});
 });
-if('speechSynthesis' in window) speechSynthesis.onvoiceschanged = fillVoiceSelect;
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = fillVoiceSelect;
+  try{ speechSynthesis.getVoices(); }catch(e){}   // 预热语音列表（iOS 首次可能为空）
+  if(isIOS) document.addEventListener('touchend', ()=>{ try{ speechSynthesis.getVoices(); }catch(e){} }, {once:true});
+}
 
 /* ===== 在线朗读：微软 Edge Neural（接近真人） ===== */
 let edgeWs = null, edgeChunks = [], edgeJob = null;
@@ -774,7 +786,7 @@ function playText(text, onDone){
 }
 function localFallback(text, onDone, token){
   if(token !== playToken) return;
-  showToast('⚠️ 在线语音连不上，已改用本地语音');
+  if(!isIOS) showToast('⚠️ 在线语音连不上，已改用本地语音');
   localSpeak(text, onDone, token);
 }
 function localSpeak(text, onDone, token){
@@ -785,8 +797,18 @@ function localSpeak(text, onDone, token){
   u.rate = settings.rate;
   const v = settings.localVoice ? getVoices().find(x=>x.name===settings.localVoice) : null;
   if(v) u.voice = v;
-  u.onend = ()=>{ if(token===playToken) onDone(); };
-  u.onerror = ()=>{ if(token===playToken) onDone(); };
+  let done = false;
+  const finish = ()=>{
+    if(done || token!==playToken) return;
+    done = true;
+    clearTimeout(u._timer);
+    onDone();
+  };
+  u.onstart = ()=>{ try{ speechSynthesis.resume(); }catch(e){} };   // iOS 必须 resume 才出声
+  u.onend = finish;
+  u.onerror = finish;
+  // iOS 部分系统不触发 onend：按时长估算兜底，防止"全部朗读"卡住
+  u._timer = setTimeout(finish, Math.max(2500, text.length * 150 / Math.max(settings.rate, 0.5)));
   speechSynthesis.speak(u);
 }
 
