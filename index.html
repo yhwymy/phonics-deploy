@@ -2,14 +2,200 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=english/">
-<title>English 学习入口</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English 小乐园 · 评级入口</title>
 <style>
-  body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:#FFF9F0;color:#3D3B4A;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;text-align:center;}
-  a{color:#E8702A;font-weight:800;text-decoration:none;}
+  :root{
+    --bg:#FFF9F0; --ink:#3D3B4A; --muted:#8A8794;
+    --card:#FFFFFF; --line:#F0E6D8;
+    --orange:#FF8C42; --blue:#4FC3F7; --green:#66BB6A; --pink:#F48FB1; --purple:#9575CD; --yellow:#FFCA28;
+    --radius:20px; --shadow:0 6px 18px rgba(150,120,60,.12);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+    background:linear-gradient(135deg,#FFF3E0,#FFE0B2);
+    color:var(--ink); line-height:1.6;
+    min-height:100vh;
+    display:flex; flex-direction:column;
+  }
+  header.top{
+    background:linear-gradient(90deg,#FF8C42,#FFB74D,#FFCA28);
+    padding:18px 16px;
+    box-shadow:0 3px 12px rgba(255,140,66,.35);
+  }
+  .top-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .brand{font-size:22px;font-weight:800;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.15);}
+  .brand small{font-weight:500;font-size:13px;opacity:.92;display:block;margin-top:-2px;}
+
+  main{max-width:900px;margin:0 auto;padding:32px 16px;flex:1;width:100%;}
+
+  .hero{
+    background:linear-gradient(135deg,#FFF3E0,#FFE0B2);
+    border:3px dashed #FFB74D; border-radius:28px; padding:30px 24px; text-align:center;
+    margin-bottom:28px;
+  }
+  .hero h1{font-size:clamp(28px,5vw,42px);font-weight:900;color:#E8702A;letter-spacing:1px;}
+  .hero p{font-size:clamp(15px,2vw,18px);color:#7A5A3A;margin-top:10px;max-width:620px;margin-inline:auto;}
+
+  .levels{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));}
+  .lcard{
+    background:var(--card);border:3px solid var(--line);border-radius:24px;padding:24px 20px;
+    box-shadow:var(--shadow);transition:.2s;cursor:pointer;position:relative;overflow:hidden;
+    text-decoration:none;color:inherit;display:block;
+  }
+  .lcard:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(150,120,60,.18);}
+  .lcard:active{transform:translateY(-1px);}
+  .lcard .badge{
+    position:absolute;top:14px;right:14px;
+    background:linear-gradient(180deg,#FFA25B,#FF8C42);color:#fff;
+    font-weight:900;font-size:14px;padding:4px 12px;border-radius:999px;
+  }
+  .lcard .lvl{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:1px;}
+  .lcard h2{font-size:24px;font-weight:900;color:#E8702A;margin:6px 0 8px;}
+  .lcard .emoji{font-size:48px;margin:8px 0 4px;display:block;}
+  .lcard p{font-size:14px;color:var(--ink);opacity:.85;}
+  .lcard .meta{
+    display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;
+    font-size:12px;font-weight:700;color:var(--muted);
+  }
+  .lcard .meta span{background:#FFF3E0;padding:3px 10px;border-radius:999px;color:#E8702A;}
+  .lcard .go{
+    margin-top:16px;display:inline-block;
+    background:linear-gradient(180deg,#7CCB7F,#66BB6A);color:#fff;
+    font-weight:800;font-size:15px;padding:8px 18px;border-radius:999px;
+  }
+  .lcard.lv2 .go{background:linear-gradient(180deg,#6CCCFA,#4FC3F7);}
+  .lcard.lv2 h2{color:#1976D2;}
+  .lcard.lv2 .badge{background:linear-gradient(180deg,#6CCCFA,#4FC3F7);}
+  .lcard.lv2 .meta span{background:#E1F5FE;color:#0277BD;}
+  .lcard.lv3 .go{background:linear-gradient(180deg,#A98FE0,#9575CD);}
+  .lcard.lv3 h2{color:#6A1B9A;}
+  .lcard.lv3 .badge{background:linear-gradient(180deg,#A98FE0,#9575CD);}
+  .lcard.lv3 .meta span{background:#F3E5F5;color:#6A1B9A;}
+  .lcard.lv4 .go{background:linear-gradient(180deg,#FFB300,#FF8F00);}
+  .lcard.lv4 h2{color:#C62828;}
+  .lcard.lv4 .badge{background:linear-gradient(180deg,#EF5350,#C62828);}
+  .lcard.lv4 .meta span{background:#FFEBEE;color:#C62828;}
+  .lcard.lv5 .go{background:linear-gradient(180deg,#26A69A,#00897B);}
+  .lcard.lv5 h2{color:#00695C;}
+  .lcard.lv5 .badge{background:linear-gradient(180deg,#26A69A,#00695C);}
+  .lcard.lv5 .meta span{background:#E0F2F1;color:#00695C;}
+  .lcard.lv6 .go{background:linear-gradient(180deg,#FFD54F,#FFA000);}
+  .lcard.lv6 h2{color:#3E2723;}
+  .lcard.lv6 .badge{background:linear-gradient(180deg,#212121,#000000);}
+  .lcard.lv6 .meta span{background:#FFF8E1;color:#E65100;border:1px solid #FFD54F;}
+
+  footer{margin-top:auto;padding:18px;text-align:center;color:var(--muted);font-size:13px;}
 </style>
 </head>
 <body>
-  <p>正在跳转到 <a href="english/">English 小乐园</a> ...</p>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">English 小乐园<small>分级学习 · Pick Your Level</small></div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>选个等级开始学 🎯</h1>
+    <p>六个等级由浅入深，建议按顺序通关。Level 1 练拼读规则，Level 2/3/4/5/6 用拼读规则练口语场景。</p>
+  </section>
+
+  <section class="levels">
+    <a class="lcard lv1" href="english/level-1.html">
+      <span class="badge">Level 1</span>
+      <span class="lvl">BEGINNER · 基础</span>
+      <span class="emoji">🔤</span>
+      <h2>自然拼读小乐园</h2>
+      <p>26 个字母 → 字母组合 → 拼读规则，配套练习和闯关游戏，零基础入门。</p>
+      <div class="meta">
+        <span>26 字母音</span>
+        <span>短元音</span>
+        <span>长元音</span>
+        <span>辅音组合</span>
+      </div>
+      <span class="go">进入学习 →</span>
+    </a>
+
+    <a class="lcard lv2" href="english/level-2.html">
+      <span class="badge">Level 2</span>
+      <span class="lvl">INTERMEDIATE · 进阶</span>
+      <span class="emoji">💬</span>
+      <h2>儿童英语口语 200 句</h2>
+      <p>200 句日常口语场景，分主题闯关：问候、校园、家庭、玩耍、求助，巩固拼读+练口语。</p>
+      <div class="meta">
+        <span>200 句型</span>
+        <span>分主题</span>
+        <span>闯关模式</span>
+        <span>语音示范</span>
+      </div>
+      <span class="go">进入学习 →</span>
+    </a>
+
+    <a class="lcard lv3" href="english/level-3.html">
+      <span class="badge">Level 3</span>
+      <span class="lvl">ADVANCED · 高级</span>
+      <span class="emoji">🗣️</span>
+      <h2>儿童英语口语 201-400 句</h2>
+      <p>201-400 句进阶口语：购物、出行、节日、情感表达、紧急情况等更复杂场景，提升流利度。</p>
+      <div class="meta">
+        <span>200 句型</span>
+        <span>复杂场景</span>
+        <span>情感表达</span>
+        <span>语音示范</span>
+      </div>
+      <span class="go">进入学习 →</span>
+    </a>
+
+    <a class="lcard lv4" href="english/level-4.html">
+      <span class="badge">Level 4</span>
+      <span class="lvl">EXPERT · 大师</span>
+      <span class="emoji">🎓</span>
+      <h2>儿童英语口语 401-600 句</h2>
+      <p>401-600 句高阶口语：讲故事、表达观点、文化话题、自由讨论，培养独立英语思维能力。</p>
+      <div class="meta">
+        <span>200 句型</span>
+        <span>故事叙述</span>
+        <span>观点表达</span>
+        <span>文化话题</span>
+      </div>
+      <span class="go">进入学习 →</span>
+    </a>
+
+    <a class="lcard lv5" href="english/level-5.html">
+      <span class="badge">Level 5</span>
+      <span class="lvl">MASTER · 大师</span>
+      <span class="emoji">🚀</span>
+      <h2>儿童英语口语 601-800 句</h2>
+      <p>601-800 句综合口语：跨文化话题、长篇叙述、抽象思维、辩论初阶，全面提升英语综合能力。</p>
+      <div class="meta">
+        <span>200 句型</span>
+        <span>跨文化</span>
+        <span>长篇叙述</span>
+        <span>辩论初阶</span>
+      </div>
+      <span class="go">进入学习 →</span>
+    </a>
+
+    <a class="lcard lv6" href="english/level-6.html">
+      <span class="badge">Level 6</span>
+      <span class="lvl">GRAND MASTER · 宗师</span>
+      <span class="emoji">🏆</span>
+      <h2>儿童英语口语 801-1000 句</h2>
+      <p>801-1000 句高阶综合：故事创编、即兴演讲、学术话题、综合输出，培养英语母语级思维。</p>
+      <div class="meta">
+        <span>200 句型</span>
+        <span>故事创编</span>
+        <span>即兴演讲</span>
+        <span>综合输出</span>
+      </div>
+      <span class="go">进入学习 →</span>
+    </a>
+  </section>
+</main>
+
+<footer>Level 1 → Level 2 → Level 3 → Level 4 → Level 5 → Level 6 通关路线 · 建议每天 15 分钟</footer>
 </body>
 </html>
