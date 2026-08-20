@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>儿童英语口语 601-800 句</title>
+<style>
+  :root{
+    --bg:#FFFBF0;
+    --card:#FFFFFF;
+    --ink:#3D3A50;
+    --muted:#9A96AB;
+    --line:#F0E9DC;
+    --accent:#FF8A5C;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    min-height:100vh;
+  }
+
+  /* ===== Header ===== */
+  .hero{
+    position:relative;
+    text-align:center;
+    padding:48px 20px 30px;
+    overflow:hidden;
+  }
+  .hero .deco{ position:absolute; font-size:34px; user-select:none; pointer-events:none; animation:float 5s ease-in-out infinite; }
+  .hero h1{
+    font-size:clamp(30px,6vw,52px);
+    font-weight:900;
+    background:linear-gradient(135deg,#FF6B6B 0%,#FF9F43 40%,#54A0FF 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    letter-spacing:2px;
+  }
+  .hero .badge{
+    display:inline-block; margin-top:12px;
+    background:linear-gradient(135deg,#6BCB77,#54A0FF);
+    color:#fff; font-size:13px; font-weight:700;
+    padding:5px 16px; border-radius:99px;
+  }
+  .hero p{
+    margin-top:10px;
+    color:var(--muted);
+    font-size:clamp(14px,2.5vw,18px);
+  }
+  .rainbow{
+    width:min(560px,80vw);
+    height:10px;
+    margin:22px auto 0;
+    border-radius:99px;
+    background:linear-gradient(90deg,#FF6B6B,#FF9F43,#FFD93D,#6BCB77,#54A0FF,#A29BFE,#FF6B9D);
+    box-shadow:0 4px 12px rgba(255,150,80,.25);
+  }
+  @keyframes float{
+    0%,100%{ transform:translateY(0) rotate(-4deg); }
+    50%{ transform:translateY(-14px) rotate(6deg); }
+  }
+
+  /* ===== Toolbar ===== */
+  .toolbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(255,251,240,.92);
+    backdrop-filter:blur(8px);
+    padding:12px 16px 10px;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .toolbar-inner{ max-width:1080px; margin:0 auto; }
+  .search-row{ display:flex; gap:10px; align-items:center; }
+  .search-box{
+    flex:1;
+    display:flex; align-items:center;
+    background:#fff; border:2px solid var(--line); border-radius:99px;
+    padding:0 16px; height:44px;
+    transition:border-color .2s;
+  }
+  .search-box:focus-within{ border-color:var(--accent); }
+  .search-box span{ font-size:18px; margin-right:8px; }
+  .search-box input{
+    flex:1; border:none; outline:none; background:transparent;
+    font-size:15px; color:var(--ink); font-family:inherit;
+  }
+  .btn{
+    border:none; border-radius:99px; cursor:pointer;
+    font-size:14px; font-weight:700; font-family:inherit;
+    padding:0 18px; height:44px; white-space:nowrap;
+    transition:transform .15s, box-shadow .15s, background .2s;
+  }
+  .btn:active{ transform:scale(.95); }
+  .btn-speak-all{
+    background:linear-gradient(135deg,#6BCB77,#54A0FF);
+    color:#fff;
+    box-shadow:0 4px 12px rgba(84,160,255,.35);
+  }
+  .btn-speak-all:hover{ box-shadow:0 6px 16px rgba(84,160,255,.45); }
+  .btn-stop{ background:#FF6B6B; color:#fff; box-shadow:0 4px 12px rgba(255,107,107,.35); }
+  .chips{
+    margin-top:10px;
+    display:flex; gap:8px; overflow-x:auto;
+    padding-bottom:4px;
+    scrollbar-width:thin;
+  }
+  .chips::-webkit-scrollbar{ height:5px; }
+  .chips::-webkit-scrollbar-thumb{ background:#E6DCC8; border-radius:99px; }
+  .chip{
+    flex:0 0 auto;
+    border:2px solid var(--line); background:#fff;
+    border-radius:99px; padding:7px 14px;
+    font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;
+    color:var(--ink); transition:all .15s;
+  }
+  .chip:hover{ border-color:var(--accent); color:var(--accent); }
+  .chip.active{ border-color:var(--accent); background:var(--accent); color:#fff; }
+
+  /* ===== 语音设置面板 ===== */
+  .btn-settings{ background:#fff; border:2px solid var(--line); color:var(--ink); }
+  .btn-settings:hover{ border-color:var(--accent); color:var(--accent); }
+  .btn-settings.on{ border-color:var(--accent); background:var(--accent); color:#fff; }
+  .settings-panel{
+    display:none; margin-top:10px;
+    background:#fff; border:2px solid var(--line); border-radius:16px;
+    padding:6px 16px 12px;
+  }
+  .settings-panel.open{ display:block; }
+  .set-row{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    padding:10px 0;
+  }
+  .set-row + .set-row{ border-top:1px dashed var(--line); }
+  .set-label{ font-size:13px; font-weight:700; color:var(--muted); min-width:64px; }
+  .set-label b{ color:var(--accent); font-size:14px; }
+  .mode-tabs{ display:flex; gap:8px; }
+  .mode-btn{
+    border:2px solid var(--line); background:#fff; border-radius:99px;
+    padding:6px 14px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit;
+    color:var(--ink); transition:all .15s;
+  }
+  .mode-btn.active{ border-color:#6BCB77; background:#EAF9EE; color:#2E7D46; }
+  .mode-btn.local.active{ border-color:#54A0FF; background:#EAF2FF; color:#2B6CB0; }
+  .settings-panel select{
+    border:2px solid var(--line); border-radius:10px; padding:7px 10px;
+    font-size:13px; font-family:inherit; color:var(--ink); background:#fff;
+    outline:none; flex:1; min-width:200px; max-width:360px;
+  }
+  .settings-panel select:focus{ border-color:var(--accent); }
+  .settings-panel input[type=range]{
+    flex:1; min-width:140px; max-width:240px; accent-color:var(--accent);
+  }
+  .try-btn{
+    border:none; border-radius:99px; background:linear-gradient(135deg,#6BCB77,#54A0FF);
+    color:#fff; padding:8px 18px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit;
+  }
+  .try-btn:active{ transform:scale(.95); }
+  .set-hint{ font-size:12px; color:var(--muted); flex-basis:100%; line-height:1.5; }
+  .toast{
+    position:fixed; left:50%; bottom:32px; transform:translateX(-50%) translateY(20px);
+    background:#3D3A50; color:#fff; padding:10px 20px; border-radius:99px;
+    font-size:13px; z-index:100; opacity:0; pointer-events:none;
+    transition:all .3s; box-shadow:0 6px 20px rgba(0,0,0,.2);
+    max-width:90vw; text-align:center;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ===== Content ===== */
+  main{ max-width:1080px; margin:0 auto; padding:18px 16px 40px; }
+  .stats{
+    font-size:13px; color:var(--muted);
+    margin:6px 2px 16px;
+  }
+  .stats b{ color:var(--accent); }
+
+  .cat{ margin-bottom:34px; scroll-margin-top:120px; }
+  .cat-head{
+    display:flex; align-items:center; gap:14px;
+    margin-bottom:14px;
+  }
+  .cat-emoji{
+    width:52px; height:52px; flex:0 0 52px;
+    border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:28px;
+    box-shadow:0 4px 10px rgba(0,0,0,.08);
+  }
+  .cat-title{ font-size:20px; font-weight:800; }
+  .cat-tags{ margin-top:4px; font-size:15px; letter-spacing:4px; }
+  .cat-count{
+    margin-left:auto; font-size:12px; font-weight:700;
+    color:#fff; padding:4px 10px; border-radius:99px;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+    gap:10px;
+  }
+  .s-card{
+    display:flex; align-items:center; gap:12px;
+    background:var(--card);
+    border:2px solid var(--line);
+    border-radius:16px;
+    padding:12px 14px;
+    cursor:pointer;
+    transition:transform .15s, box-shadow .2s, border-color .2s;
+    position:relative;
+    overflow:hidden;
+  }
+  .s-card::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:5px;
+    background:var(--c); opacity:0;
+    transition:opacity .2s;
+  }
+  .s-card:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,.08); }
+  .s-card:hover::before{ opacity:1; }
+  .s-card.speaking{
+    border-color:var(--c);
+    background:color-mix(in srgb, var(--c) 6%, #fff);
+  }
+  .num{
+    flex:0 0 34px; width:34px; height:34px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:800; color:#fff;
+  }
+  .txt{ flex:1; min-width:0; }
+  .en{
+    font-size:17px; font-weight:700; line-height:1.35;
+    font-family:"Comic Sans MS","Segoe UI","Microsoft YaHei",sans-serif;
+  }
+  .zh{ font-size:13.5px; color:var(--muted); margin-top:2px; line-height:1.4; }
+  .speak-btn{
+    flex:0 0 36px; width:36px; height:36px;
+    border:none; border-radius:50%;
+    background:#F6F1E6; cursor:pointer;
+    font-size:17px; line-height:1;
+    transition:all .15s;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .speak-btn:hover{ background:var(--c); }
+  .s-card.speaking .speak-btn{ background:var(--c); animation:pulse 1s infinite; }
+  @keyframes pulse{
+    0%,100%{ box-shadow:0 0 0 0 color-mix(in srgb, var(--c) 45%, transparent); }
+    50%{ box-shadow:0 0 0 8px transparent; }
+  }
+  .s-card.hidden{ display:none; }
+
+  .empty{
+    text-align:center; padding:50px 20px; color:var(--muted);
+    font-size:16px;
+  }
+  .empty .big{ font-size:48px; display:block; margin-bottom:10px; }
+
+  /* category flash when jumped */
+  .cat.flash .cat-head .cat-emoji{ animation:bounce .8s ease; }
+  @keyframes bounce{
+    0%,100%{ transform:scale(1); }
+    40%{ transform:scale(1.25) rotate(-6deg); }
+  }
+
+  footer{
+    text-align:center; padding:24px 16px 36px;
+    color:var(--muted); font-size:13px;
+    border-top:1px solid var(--line);
+  }
+  footer b{ color:var(--ink); }
+
+  @media (max-width:560px){
+    .grid{ grid-template-columns:1fr; }
+    .btn-speak-all{ padding:0 14px; font-size:13px; }
+    .search-box{ height:42px; }
+    .btn{ height:42px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <span class="deco" style="top:18px; left:8%;">🚀</span>
+  <span class="deco" style="top:60px; right:10%; animation-delay:.6s;">🌟</span>
+  <span class="deco" style="bottom:30px; left:14%; animation-delay:1.2s;">🎯</span>
+  <span class="deco" style="bottom:44px; right:16%; animation-delay:.3s;">🏆</span>
+  <span class="deco" style="top:20px; left:44%; animation-delay:1.8s; font-size:26px;">🦁</span>
+  <span class="deco" style="top:120px; left:22%; animation-delay:2.2s; font-size:26px;">🌍</span>
+  <h1>儿童英语口语 601-800 句</h1>
+  <span class="badge">⭐ 生活实用篇 · 吃喝拉撒全都有</span>
+  <p>每天听一听 · 读一读 · 开口说 👨‍👩‍👧‍👦 点击任意句子即可朗读</p>
+  <div class="rainbow"></div>
+</header>
+
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <div class="search-row">
+      <div class="search-box">
+        <span>🔍</span>
+        <input id="searchInput" type="text" placeholder="搜索英文或中文，如：hobby / 梦想">
+      </div>
+      <button class="btn btn-speak-all" id="speakAllBtn">🔊 全部朗读</button>
+      <button class="btn btn-settings" id="settingsBtn">⚙️ 语音</button>
+    </div>
+    <div class="settings-panel" id="settingsPanel">
+      <div class="set-row">
+        <span class="set-label">朗读模式</span>
+        <div class="mode-tabs">
+          <button class="mode-btn active" id="modeOnline">🌐 在线自然语音</button>
+          <button class="mode-btn local" id="modeLocal">💻 本地语音</button>
+        </div>
+      </div>
+      <div class="set-row">
+        <span class="set-label">语音</span>
+        <select id="voiceSelect"></select>
+      </div>
+      <div class="set-row">
+        <span class="set-label">语速 <b id="rateVal">0.90</b></span>
+        <input type="range" id="rateRange" min="0.5" max="1.3" step="0.05" value="0.9">
+        <button class="try-btn" id="tryBtn">🔊 试听</button>
+      </div>
+      <div class="set-row">
+        <span class="set-hint">💡 在线语音是微软神经网络语音（接近真人），需联网；连不上时会自动改用本地语音</span>
+      </div>
+      <div class="set-row" id="iosHint" style="display:none;">
+        <span class="set-hint" style="color:#FF6B6B;">📱 当前是 iOS 设备：在线语音连不上，已自动使用系统语音，直接点句子就能听</span>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+</div>
+
+<main>
+  <div class="stats" id="stats"></div>
+  <div id="content"></div>
+  <div class="empty hidden" id="empty">
+    <span class="big">🤔</span>
+    没有找到相关句子，换个词试试吧~
+  </div>
+</main>
+
+<footer>
+  <b>儿童英语口语 601-800 句（生活实用篇）</b> · 20 大主题 · 点击句子听发音<br>
+  朗读默认使用微软在线自然语音（接近真人），网络不通时自动切换本地语音 💡
+</footer>
+
+<script>
+/* ================= 数据 ================= */
+const CATS = [
+  { id:'toilet',  name:'上厕所', emoji:'🚻', tags:'🚻🧻💦', color:'#FF6B6B', list:[
+    ['I need to go to the bathroom.', '我要上厕所。'],
+    ['I need to pee.', '我要尿尿。'],
+    ['I need to poop.', '我要拉便便。'],
+    ['May I use the toilet, please?', '请问我可以上厕所吗？'],
+    ['Can I go to the toilet?', '我可以去上厕所吗？'],
+    ['I drank too much water.', '我水喝多了。'],
+    ["Don't hold it in.", '别憋着。'],
+    ['Wash your hands after you poop.', '拉完便便要洗手。'],
+    ['Flush the toilet when you are done.', '上完要冲马桶。'],
+    ['I finished. Can I get down now?', '我拉完了，可以下来了吗？'],
+  ]},
+  { id:'meal',   name:'吃饭进行时', emoji:'🍚', tags:'🍚🥢🍜', color:'#FF9F43', list:[
+    ['I am still eating.', '我还在吃呢。'],
+    ['I want some more rice.', '我想再要一点米饭。'],
+    ['Chew your food slowly.', '慢慢嚼。'],
+    ['This soup is too hot.', '这个汤太烫了。'],
+    ['Can I have a glass of water?', '我可以喝杯水吗？'],
+    ['I am full now.', '我吃饱了。'],
+    ['I do not like onions.', '我不喜欢吃洋葱。'],
+    ['Try one bite, please.', '请尝一口吧。'],
+    ['I am thirsty.', '我渴了。'],
+    ['Help me set the table.', '帮我摆碗筷。'],
+  ]},
+  { id:'chore',  name:'帮忙做家务', emoji:'🧹', tags:'🧹🧺🧽', color:'#FFD43B', list:[
+    ['I can help you clean the room.', '我可以帮你打扫房间。'],
+    ['Let me take out the trash.', '让我去倒垃圾。'],
+    ['I will make my bed.', '我会自己叠被子。'],
+    ['Please put your toys away.', '请把你的玩具收好。'],
+    ['I will feed the fish.', '我来喂鱼。'],
+    ['The floor is dirty.', '地板脏了。'],
+    ['I will sweep the floor.', '我来扫地。'],
+    ['Can I water the flowers?', '我可以浇花吗？'],
+    ['I am doing the dishes.', '我在洗碗。'],
+    ['Clean your desk, please.', '请把你的书桌擦干净。'],
+  ]},
+  { id:'school', name:'学校的一天', emoji:'🏫', tags:'🏫📚✏️', color:'#6BCB77', list:[
+    ['The bell is ringing.', '上课铃响了。'],
+    ['I need to hand in my homework.', '我要交作业了。'],
+    ['We have a test today.', '我们今天有考试。'],
+    ['I forgot my pencil case.', '我忘带铅笔盒了。'],
+    ['Can I borrow your eraser?', '我可以借你的橡皮吗？'],
+    ['I got a star from the teacher.', '老师奖励了我一颗星。'],
+    ['We will have a field trip.', '我们要去春游了。'],
+    ['The lesson is over.', '下课了。'],
+    ['I packed my schoolbag.', '我收拾好书包了。'],
+    ['I will do my best.', '我会尽力的。'],
+  ]},
+  { id:'hygiene',name:'讲卫生', emoji:'🧼', tags:'🧼🪥🛁', color:'#38D9A9', list:[
+    ['I washed my hands.', '我洗过手了。'],
+    ['Brush your teeth twice a day.', '每天刷两次牙。'],
+    ['I am taking a shower.', '我在洗澡。'],
+    ['My hair is dirty.', '我的头发脏了。'],
+    ['Cut your nails, please.', '请剪一下指甲。'],
+    ['I use a tissue to blow my nose.', '我用纸巾擤鼻涕。'],
+    ['Keep your clothes clean.', '保持衣服干净。'],
+    ['I need a bath.', '我要洗个澡。'],
+    ['Put on clean socks.', '穿上干净的袜子。'],
+    ['I hate being dirty.', '我不喜欢脏兮兮的。'],
+  ]},
+  { id:'sleep',  name:'睡觉起床', emoji:'🛏️', tags:'🛏️😴🌙', color:'#4DABF7', list:[
+    ['I am sleepy.', '我困了。'],
+    ['Read me a bedtime story.', '给我读个睡前故事吧。'],
+    ['I will go to bed at nine.', '我九点睡觉。'],
+    ['I slept well last night.', '我昨晚睡得很好。'],
+    ['I had a scary dream.', '我做了个可怕的梦。'],
+    ['It is time to get up.', '该起床了。'],
+    ['I want five more minutes.', '我想再睡五分钟。'],
+    ['I stretch in the morning.', '我早上伸懒腰。'],
+    ['Turn off the light, please.', '请关灯。'],
+    ['Good night. See you tomorrow.', '晚安，明天见。'],
+  ]},
+  { id:'screen', name:'看电视玩游戏', emoji:'📺', tags:'📺🎮🕹️', color:'#748FFC', list:[
+    ['Can I watch one more show?', '我能再看一集吗？'],
+    ['The cartoon is on now.', '动画片开始了。'],
+    ['Turn down the volume, please.', '请把音量调小一点。'],
+    ['I like playing video games.', '我喜欢打游戏。'],
+    ['It is your turn now.', '现在轮到你了。'],
+    ['You are so good at this game.', '你游戏玩得真好。'],
+    ['Time is up. It is my turn.', '时间到了，轮到我了。'],
+    ['I will pause the game.', '我先暂停一下游戏。'],
+    ['We should share the remote.', '我们应该共用遥控器。'],
+    ['Turn off the TV after watching.', '看完电视要关掉。'],
+  ]},
+  { id:'ride',   name:'坐车出行', emoji:'🚗', tags:'🚗🚌🚕', color:'#9775FA', list:[
+    ['Put on your seatbelt.', '系好安全带。'],
+    ['I feel carsick.', '我晕车。'],
+    ['Are we there yet?', '我们到了吗？'],
+    ['How much longer?', '还有多远啊？'],
+    ['I want to sit by the window.', '我想坐窗边。'],
+    ['Look at that big truck!', '看那辆大卡车！'],
+    ['We are stuck in traffic.', '我们堵车了。'],
+    ['I will wait at the bus stop.', '我在公交站等。'],
+    ['The bus is coming.', '公交车来了。'],
+    ["Let's get off the bus.", '我们下车吧。'],
+  ]},
+  { id:'outdoor',name:'户外游玩', emoji:'🏖️', tags:'🏖️⛺🎡', color:'#F783AC', list:[
+    ["Let's go to the park.", '我们去公园吧。'],
+    ['I want to play on the swings.', '我想玩秋千。'],
+    ["Let's build a sandcastle.", '我们来堆沙堡吧。'],
+    ['The sun is too strong.', '太阳太晒了。'],
+    ['Put on some sunscreen.', '涂点防晒霜。'],
+    ['I found a pretty shell.', '我捡到一个漂亮的贝壳。'],
+    ["Let's climb the hill.", '我们去爬山吧。'],
+    ['I am out of breath.', '我喘不过气了。'],
+    ['The view is amazing.', '这里的景色真美。'],
+    ['I had so much fun today.', '今天玩得太开心了。'],
+  ]},
+  { id:'pet',    name:'宠物小动物', emoji:'🐶', tags:'🐶🐱🐹', color:'#63E6BE', list:[
+    ['My dog is wagging his tail.', '我的狗在摇尾巴。'],
+    ['Can I pet your cat?', '我可以摸摸你的猫吗？'],
+    ['The kitten is so cute.', '这只小猫真可爱。'],
+    ['I walk my dog every day.', '我每天都遛狗。'],
+    ['My hamster is running in the wheel.', '我的仓鼠在跑轮子。'],
+    ['The bird is singing.', '小鸟在唱歌。'],
+    ['I feed my rabbit carrots.', '我喂兔子吃胡萝卜。'],
+    ['My pet sleeps a lot.', '我的宠物很能睡。'],
+    ['The fish is hiding behind the rock.', '鱼躲在石头后面。'],
+    ['I love my little pet.', '我爱我的小宠物。'],
+  ]},
+  { id:'birthday',name:'过生日', emoji:'🎂', tags:'🎂🎁🎈', color:'#FF8787', list:[
+    ['Today is my birthday!', '今天是我的生日！'],
+    ['Happy birthday to you!', '祝你生日快乐！'],
+    ['I am turning eight years old.', '我八岁了。'],
+    ['Make a wish and blow out the candles.', '许个愿，吹蜡烛。'],
+    ['I got a cool gift.', '我收到一个很酷的礼物。'],
+    ['Thank you for coming to my party.', '谢谢你来参加我的派对。'],
+    ["Let's cut the cake together.", '我们一起切蛋糕吧。'],
+    ['The party is so much fun.', '派对上太好玩了。'],
+    ['I will send thank-you cards.', '我要寄感谢卡。'],
+    ['This is the best birthday ever.', '这是最棒的生日。'],
+  ]},
+  { id:'money',  name:'零花钱与购物', emoji:'💰', tags:'💰🪙🛒', color:'#FFC078', list:[
+    ['I saved my pocket money.', '我攒了零花钱。'],
+    ['How much does this cost?', '这个多少钱？'],
+    ['It is too expensive.', '太贵了。'],
+    ['Can you give me a discount?', '可以给我打个折吗？'],
+    ['I want to buy this toy.', '我想买这个玩具。'],
+    ['I am counting my coins.', '我在数硬币。'],
+    ['I will save up for a bike.', '我要存钱买自行车。'],
+    ['The change is on the table.', '找零在桌上。'],
+    ['I paid by cash.', '我用现金付的。'],
+    ['I got a receipt.', '我拿到收据了。'],
+  ]},
+  { id:'sick',   name:'生病不舒服', emoji:'🤒', tags:'🤒🤧🤕', color:'#94D82D', list:[
+    ['I have a stomachache.', '我肚子疼。'],
+    ['My head hurts.', '我头疼。'],
+    ['I have a fever.', '我发烧了。'],
+    ['I feel dizzy.', '我头晕。'],
+    ['I have a runny nose.', '我流鼻涕。'],
+    ['My throat is sore.', '我嗓子疼。'],
+    ['I need to rest.', '我需要休息。'],
+    ['Take this medicine after meals.', '饭后吃这个药。'],
+    ['Drink more warm water.', '多喝温水。'],
+    ['I feel better now.', '我感觉好多了。'],
+  ]},
+  { id:'class',  name:'上课发言', emoji:'🧑‍🏫', tags:'🧑‍🏫🙋✋', color:'#20C997', list:[
+    ['I have a question.', '我有个问题。'],
+    ['May I ask something?', '我可以问个问题吗？'],
+    ['I know the answer.', '我知道答案。'],
+    ['Let me try.', '让我试试。'],
+    ['Can you say it again?', '你能再说一遍吗？'],
+    ['I did not hear you clearly.', '我没听清。'],
+    ['Please speak louder.', '请大声一点。'],
+    ['I can explain it.', '我可以解释一下。'],
+    ['Did I get it right?', '我说对了吗？'],
+    ['Thank you for your help.', '谢谢你的帮助。'],
+  ]},
+  { id:'friend', name:'和朋友相处', emoji:'👫', tags:'👫🤝😊', color:'#339AF0', list:[
+    ["Let's play together.", '我们一起玩吧。'],
+    ['Can I join you?', '我可以加入你们吗？'],
+    ['Sorry, I did not mean it.', '对不起，我不是故意的。'],
+    ["Let's make up and be friends.", '我们和好吧。'],
+    ['You are my best friend.', '你是我最好的朋友。'],
+    ['Let me share with you.', '我跟你分享。'],
+    ['It is my turn to choose.', '轮到我选了。'],
+    ['We should take turns.', '我们应该轮流来。'],
+    ['I will wait for you.', '我会等你。'],
+    ['Friends help each other.', '朋友要互相帮助。'],
+  ]},
+  { id:'mood',   name:'表达心情', emoji:'😊', tags:'😊😢😡', color:'#7048E8', list:[
+    ['I am so happy today.', '我今天很开心。'],
+    ['I feel proud of myself.', '我为自己感到骄傲。'],
+    ['I am a little nervous.', '我有点紧张。'],
+    ['I feel bored.', '我觉得无聊。'],
+    ['I am scared of the dark.', '我怕黑。'],
+    ['I am excited about the trip.', '我对这次旅行很兴奋。'],
+    ['I am in a good mood.', '我心情很好。'],
+    ['I am a bit sad.', '我有点难过。'],
+    ['I am angry right now.', '我现在很生气。'],
+    ['I feel much better.', '我感觉好多了。'],
+  ]},
+  { id:'why',    name:'问为什么', emoji:'❓', tags:'❓🤔💡', color:'#E64980', list:[
+    ['Why is the sky blue?', '为什么天空是蓝色的？'],
+    ['Where does the rainbow come from?', '彩虹从哪里来？'],
+    ['Why do birds fly?', '为什么鸟儿会飞？'],
+    ['How does a seed grow?', '种子是怎么长大的？'],
+    ['Why is the moon so bright?', '为什么月亮那么亮？'],
+    ['Where do babies come from?', '宝宝是从哪里来的？'],
+    ['Why do we dream?', '我们为什么会做梦？'],
+    ['How do fish breathe underwater?', '鱼在水下怎么呼吸？'],
+    ['Why is the grass green?', '为什么草是绿色的？'],
+    ['I love asking questions.', '我爱问问题。'],
+  ]},
+  { id:'polite', name:'礼貌用语', emoji:'🗣️', tags:'🗣️🙏😌', color:'#FCC419', list:[
+    ['Excuse me, may I pass?', '打扰一下，我能过去吗？'],
+    ['Would you mind helping me?', '你介意帮我一下吗？'],
+    ['I am sorry to bother you.', '抱歉打扰你了。'],
+    ['Thank you very much.', '非常感谢。'],
+    ['That is very kind of you.', '你真是太好了。'],
+    ['No problem at all.', '完全没问题。'],
+    ['After you.', '您先请。'],
+    ['I owe you one.', '我欠你一个人情。'],
+    ['It was my pleasure.', '这是我的荣幸。'],
+    ['You are welcome.', '不客气。'],
+  ]},
+  { id:'time',   name:'时间管理', emoji:'🕐', tags:'🕐⏰📅', color:'#5C7CFA', list:[
+    ['What time is it now?', '现在几点了？'],
+    ['It is half past seven.', '现在七点半。'],
+    ['Hurry up! We will be late.', '快点！我们要迟到了。'],
+    ['I am running out of time.', '我没时间了。'],
+    ['We have ten minutes left.', '我们只剩十分钟了。'],
+    ["Let's make a schedule.", '我们做个时间表吧。'],
+    ['I finished it on time.', '我按时完成了。'],
+    ["Don't waste time.", '别浪费时间。'],
+    ['Time flies when we play.', '玩的时候时间过得真快。'],
+    ['I will do it right away.', '我马上去做。'],
+  ]},
+  { id:'night',  name:'晚上睡前', emoji:'🌙', tags:'🌙🛌💤', color:'#22B8CF', list:[
+    ['It is almost bedtime.', '快到睡觉时间了。'],
+    ['I brushed my teeth already.', '我已经刷牙了。'],
+    ['I put on my pajamas.', '我换上睡衣了。'],
+    ['Say goodnight to grandma.', '跟奶奶说晚安。'],
+    ['Can I have a hug?', '可以抱抱我吗？'],
+    ['I am counting sheep.', '我在数羊。'],
+    ['Leave the light on, please.', '请开着灯。'],
+    ['I will dream of you.', '我会梦见你的。'],
+    ['Sweet dreams.', '做个好梦。'],
+    ['Sleep tight.', '睡个好觉。'],
+  ]},
+]
+const TOTAL = CATS.reduce((s,c)=>s+c.list.length,0);
+
+/* ================= 渲染 ================= */
+const content = document.getElementById('content');
+const chips = document.getElementById('chips');
+const stats = document.getElementById('stats');
+const emptyBox = document.getElementById('empty');
+const searchInput = document.getElementById('searchInput');
+const speakAllBtn = document.getElementById('speakAllBtn');
+
+let activeCat = 'all';
+let globalIdx = 800;   // 接续 601-800
+let cards = [];       // {el, catId, en, zh}
+
+CATS.forEach((cat, ci)=>{
+  const sec = document.createElement('section');
+  sec.className = 'cat';
+  sec.id = 'cat-' + cat.id;
+  sec.style.setProperty('--c', cat.color);
+
+  const head = document.createElement('div');
+  head.className = 'cat-head';
+  head.innerHTML =
+    '<div class="cat-emoji" style="background:'+cat.color+'22;">'+cat.emoji+'</div>' +
+    '<div><div class="cat-title">'+ci+'. '+cat.name+'</div>' +
+    '<div class="cat-tags">'+cat.tags+'</div></div>' +
+    '<span class="cat-count" style="background:'+cat.color+';">'+cat.list.length+' 句</span>';
+  sec.appendChild(head);
+
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+
+  cat.list.forEach((item)=>{
+    globalIdx++;
+    const en = item[0], zh = item[1];
+    const card = document.createElement('div');
+    card.className = 's-card';
+    card.style.setProperty('--c', cat.color);
+    card.dataset.cat = cat.id;
+    card.dataset.en = en;
+    card.title = '点击朗读：' + en;
+    card.innerHTML =
+      '<span class="num" style="background:'+cat.color+';">'+globalIdx+'</span>' +
+      '<div class="txt"><div class="en">'+en+'</div><div class="zh">'+zh+'</div></div>' +
+      '<button class="speak-btn" title="朗读">🔊</button>';
+
+    card.addEventListener('click', ()=>speakOne(card));
+    grid.appendChild(card);
+    cards.push({el:card, catId:cat.id, en:en, zh:zh});
+  });
+
+  sec.appendChild(grid);
+  content.appendChild(sec);
+});
+
+/* chips */
+const allChip = document.createElement('button');
+allChip.className = 'chip active';
+allChip.textContent = '🏠 全部（'+TOTAL+'）';
+chips.appendChild(allChip);
+CATS.forEach((cat, ci)=>{
+  const c = document.createElement('button');
+  c.className = 'chip';
+  c.textContent = cat.emoji+' '+cat.name;
+  c.addEventListener('click', ()=>{
+    activeCat = cat.id;
+    setActiveChip(c);
+    applyFilter();
+    document.getElementById('cat-'+cat.id).scrollIntoView({behavior:'smooth', block:'start'});
+    flash(cat.id);
+  });
+  chips.appendChild(c);
+});
+allChip.addEventListener('click', ()=>{
+  activeCat = 'all';
+  setActiveChip(allChip);
+  applyFilter();
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+function setActiveChip(elm){
+  chips.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+  elm.classList.add('active');
+}
+
+function flash(catId){
+  const sec = document.getElementById('cat-'+catId);
+  sec.classList.remove('flash');
+  void sec.offsetWidth;
+  sec.classList.add('flash');
+}
+
+/* ================= 筛选 ================= */
+function applyFilter(){
+  const q = searchInput.value.trim().toLowerCase();
+  let visible = 0;
+  cards.forEach(c=>{
+    const catOk = activeCat==='all' || c.catId===activeCat;
+    const qOk = !q || c.en.toLowerCase().includes(q) || c.zh.includes(q);
+    const show = catOk && qOk;
+    c.el.classList.toggle('hidden', !show);
+    if(show) visible++;
+  });
+  stats.innerHTML = '共 <b>'+TOTAL+'</b> 句（第 601~800 句） · 20 个主题' + (activeCat!=='all' ? ' · 当前分类' : '') + (q ? ' · 搜索到 <b>'+visible+'</b> 条' : '');
+  emptyBox.classList.toggle('hidden', visible>0);
+}
+searchInput.addEventListener('input', applyFilter);
+stats.innerHTML = '共 <b>'+TOTAL+'</b> 句（第 601~800 句） · 20 个主题 · 点击句子听发音';
+
+/* ================= 语音设置 ================= */
+const $ = id => document.getElementById(id);
+const EDGE_WSS  = 'wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1';
+const EDGE_TOKEN = '6A5AA1D4EAFF4E9FB37E23D68491D6F4';
+const EDGE_VOICES = [
+  {name:'en-US-JennyNeural', label:'Jenny 女声 · 自然清晰（推荐）'},
+  {name:'en-US-AnaNeural',   label:'Ana 童声 · 适合小朋友跟读'},
+  {name:'en-US-AriaNeural',  label:'Aria 女声 · 标准美音'},
+  {name:'en-US-GuyNeural',   label:'Guy 男声 · 标准美音'},
+  {name:'en-GB-LibbyNeural', label:'Libby 女声 · 英音'},
+  {name:'en-GB-RyanNeural',  label:'Ryan 男声 · 英音'}
+];
+
+let settings = { mode:'online', edgeVoice:'en-US-JennyNeural', localVoice:'', rate:0.9 };
+// iOS 检测：iPhone/iPad，以及新版 iPadOS（UA 伪装成 Mac）
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+if(isIOS) settings.mode = 'local';   // iOS 连不上微软在线语音，强制用系统语音
+try{ const s = JSON.parse(localStorage.getItem('kids800_voice')); if(s) settings = Object.assign(settings, s); }catch(e){}
+
+const settingsBtn = $('settingsBtn'), settingsPanel = $('settingsPanel');
+const modeOnline = $('modeOnline'), modeLocal = $('modeLocal');
+const voiceSelect = $('voiceSelect'), rateRange = $('rateRange'), rateVal = $('rateVal');
+rateRange.value = settings.rate; rateVal.textContent = settings.rate.toFixed(2);
+
+function getVoices(){ try{ return speechSynthesis.getVoices() || []; }catch(e){ return []; } }
+function escXml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;'); }
+function rankVoice(v){
+  let s = 0;
+  if(/(natural|neural|online)/i.test(v.name)) s -= 10;
+  if(/(female|zira|jenny|aria|hazel|sonia)/i.test(v.name)) s -= 1;
+  return s;
+}
+function fillVoiceSelect(){
+  voiceSelect.innerHTML = '';
+  if(settings.mode === 'online'){
+    EDGE_VOICES.forEach(v=>{
+      const o = document.createElement('option');
+      o.value = v.name; o.textContent = v.label;
+      if(v.name === settings.edgeVoice) o.selected = true;
+      voiceSelect.appendChild(o);
+    });
+  }else{
+    const ens = getVoices().filter(v=>/^en/i.test(v.lang||'')).sort((a,b)=>rankVoice(a)-rankVoice(b));
+    if(ens.length===0){
+      const o = document.createElement('option');
+      o.value=''; o.textContent='（未找到英语语音，使用默认音色）';
+      voiceSelect.appendChild(o);
+    }else{
+      ens.forEach(v=>{
+        const o = document.createElement('option');
+        o.value = v.name; o.textContent = v.name + ' (' + v.lang + ')';
+        if(v.name === settings.localVoice) o.selected = true;
+        voiceSelect.appendChild(o);
+      });
+    }
+  }
+}
+function setMode(mode){
+  if(isIOS && mode==='online'){ showToast('⚠️ iOS 设备用不了在线语音，已使用系统语音'); return; }
+  settings.mode = mode;
+  modeOnline.classList.toggle('active', mode==='online');
+  modeLocal.classList.toggle('active', mode==='local');
+  fillVoiceSelect(); saveSettings();
+}
+function saveSettings(){
+  try{ localStorage.setItem('kids800_voice', JSON.stringify(settings)); }catch(e){}
+}
+modeOnline.addEventListener('click', ()=>setMode('online'));
+modeLocal.addEventListener('click', ()=>setMode('local'));
+voiceSelect.addEventListener('change', ()=>{
+  if(settings.mode==='online') settings.edgeVoice = voiceSelect.value;
+  else settings.localVoice = voiceSelect.value;
+  saveSettings();
+});
+rateRange.addEventListener('input', ()=>{
+  settings.rate = parseFloat(rateRange.value);
+  rateVal.textContent = settings.rate.toFixed(2);
+  saveSettings();
+});
+settingsBtn.addEventListener('click', ()=>{
+  settingsPanel.classList.toggle('open');
+  settingsBtn.classList.toggle('on', settingsPanel.classList.contains('open'));
+  const ih = $('iosHint'); if(ih) ih.style.display = isIOS ? '' : 'none';
+  fillVoiceSelect();
+});
+$('tryBtn').addEventListener('click', ()=>{
+  stopSpeak();
+  playText('Hello! How are you today?', ()=>{});
+});
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = fillVoiceSelect;
+  try{ speechSynthesis.getVoices(); }catch(e){}   // 预热语音列表（iOS 首次可能为空）
+  if(isIOS) document.addEventListener('touchend', ()=>{ try{ speechSynthesis.getVoices(); }catch(e){} }, {once:true});
+}
+
+/* ===== 在线朗读：微软 Edge Neural（接近真人） ===== */
+let edgeWs = null, edgeChunks = [], edgeJob = null;
+function uuid(){
+  if(crypto.randomUUID) return crypto.randomUUID();
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{
+    const r = Math.random()*16|0; return (c==='x'?r:(r&0x3|0x8)).toString(16);
+  });
+}
+function edgeConnect(){
+  return new Promise((resolve, reject)=>{
+    if(edgeWs && edgeWs.readyState===WebSocket.OPEN){ resolve(edgeWs); return; }
+    if(edgeWs) try{ edgeWs.close(); }catch(e){}
+    const ws = new WebSocket(EDGE_WSS+'?TrustedClientToken='+EDGE_TOKEN+'&ConnectionId='+uuid());
+    edgeWs = ws;
+    ws.binaryType = 'arraybuffer';
+    ws.onopen = ()=>{
+      ws.send('X-Timestamp:'+new Date().toUTCString()+'\r\nContent-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n'+
+        JSON.stringify({context:{synthesis:{audio:{metadataoptions:{sentenceBoundaryEnabled:'false',wordBoundaryEnabled:'false'},outputFormat:'audio-24khz-48kbitrate-mono-mp3'}}}}));
+      resolve(ws);
+    };
+    ws.onerror = ()=>{ reject(new Error('edge-ws-error')); };
+    ws.onclose = ()=>{
+      edgeWs = null;
+      // 连接意外断开且还有未完成任务时立即失败，避免干等 8 秒超时
+      const job = edgeJob;
+      if(job){ edgeJob = null; clearTimeout(job.timer); job.reject(new Error('edge-ws-closed')); }
+    };
+    ws.onmessage = (ev)=>{
+      if(typeof ev.data === 'string'){
+        if(ev.data.indexOf('turn.end')>=0){
+          // 按 X-RequestId 匹配当前任务，防止旧请求的结束帧误触发新任务
+          const job = edgeJob;
+          const rid = (ev.data.match(/X-RequestId:\s*(\S+)/i)||[])[1];
+          if(job && rid === job.rid){
+            edgeJob = null;
+            clearTimeout(job.timer);
+            const blob = new Blob(edgeChunks, {type:'audio/mpeg'});
+            edgeChunks = [];
+            job.resolve(URL.createObjectURL(blob));
+          }
+        }
+        return;
+      }
+      const buf = new Uint8Array(ev.data);
+      if(buf.length < 2) return;
+      const hlen = buf[0] | (buf[1]<<8);
+      if(buf.length < 2+hlen) return;
+      try{
+        const h = JSON.parse(new TextDecoder().decode(buf.slice(2, 2+hlen)));
+        // 只收集当前任务对应的音频数据，防止并发请求数据串扰
+        if(h.type === 'audio' && 2+hlen < buf.length && edgeJob && h.requestId === edgeJob.rid){
+          edgeChunks.push(buf.slice(2+hlen));
+        }
+      }catch(e){}
+    };
+  });
+}
+function edgeSpeak(text){
+  return new Promise((resolve, reject)=>{
+    edgeConnect().then(ws=>{
+      if(ws.readyState !== WebSocket.OPEN){ reject(new Error('edge-ws-closed')); return; }
+      const rid = uuid();
+      edgeChunks = [];
+      const job = {resolve, reject, timer:null, rid:rid};
+      edgeJob = job;
+      job.timer = setTimeout(()=>{          // 8 秒拿不到音频视为失败
+        if(edgeJob===job){ edgeJob=null; reject(new Error('edge-timeout')); }
+      }, 8000);
+      const ssml = "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='en-US'><voice name='"
+        + settings.edgeVoice + "'><prosody pitch='+0Hz' rate='" + Math.round((settings.rate-1)*100)
+        + "%' volume='+0%'>" + escXml(text) + "</prosody></voice></speak>";
+      try{
+        ws.send('X-RequestId:'+rid+'\r\nContent-Type:application/ssml+xml\r\nX-Timestamp:'
+          + new Date().toUTCString() + '\r\nPath:ssml\r\n\r\n' + ssml);
+      }catch(e){ reject(e); }
+    }).catch(reject);
+  });
+}
+
+/* ===== 统一朗读管线（在线 → 本地回退） ===== */
+let playToken = 0, edgeAudio = null, allPlaying = false;
+function stopSpeak(){
+  playToken++;
+  allPlaying = false;
+  if(edgeJob){ clearTimeout(edgeJob.timer); edgeJob = null; }
+  edgeChunks = [];
+  if(edgeAudio){ try{ edgeAudio.pause(); }catch(e){} edgeAudio = null; }
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+  document.querySelectorAll('.s-card.speaking').forEach(el=>el.classList.remove('speaking'));
+  speakAllBtn.textContent = '🔊 全部朗读';
+  speakAllBtn.classList.remove('btn-stop');
+}
+function playText(text, onDone){
+  const token = playToken;
+  if(settings.mode === 'online'){
+    edgeSpeak(text).then(url=>{
+      if(token !== playToken){ URL.revokeObjectURL(url); return; }
+      edgeAudio = new Audio(url);
+      edgeAudio.onended = ()=>{ URL.revokeObjectURL(url); edgeAudio = null; if(token===playToken) onDone(); };
+      edgeAudio.onerror = ()=>{ URL.revokeObjectURL(url); edgeAudio = null; localFallback(text, onDone, token); };
+      edgeAudio.play().catch(()=>{ URL.revokeObjectURL(url); edgeAudio = null; localFallback(text, onDone, token); });
+    }).catch(()=>localFallback(text, onDone, token));
+  }else{
+    localSpeak(text, onDone, token);
+  }
+}
+function localFallback(text, onDone, token){
+  if(token !== playToken) return;
+  if(!isIOS) showToast('⚠️ 在线语音连不上，已改用本地语音');
+  localSpeak(text, onDone, token);
+}
+function localSpeak(text, onDone, token){
+  if(!('speechSynthesis' in window)){ onDone(); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = settings.rate;
+  const v = settings.localVoice ? getVoices().find(x=>x.name===settings.localVoice) : null;
+  if(v) u.voice = v;
+  let done = false;
+  const finish = ()=>{
+    if(done || token!==playToken) return;
+    done = true;
+    clearTimeout(u._timer);
+    onDone();
+  };
+  u.onstart = ()=>{ try{ speechSynthesis.resume(); }catch(e){} };   // iOS 必须 resume 才出声
+  u.onend = finish;
+  u.onerror = finish;
+  // iOS 部分系统不触发 onend：按时长估算兜底，防止"全部朗读"卡住
+  u._timer = setTimeout(finish, Math.max(2500, text.length * 150 / Math.max(settings.rate, 0.5)));
+  speechSynthesis.speak(u);
+}
+
+/* ===== 单句 / 全部朗读 ===== */
+function speakOne(card){
+  stopSpeak();
+  card.classList.add('speaking');
+  playText(card.dataset.en, ()=>{ card.classList.remove('speaking'); });
+}
+speakAllBtn.addEventListener('click', ()=>{
+  if(allPlaying){ stopSpeak(); return; }
+  const visible = cards.filter(c=>!c.el.classList.contains('hidden'));
+  if(visible.length===0) return;
+  allPlaying = true;
+  speakAllBtn.textContent = '⏹ 停止朗读';
+  speakAllBtn.classList.add('btn-stop');
+  let i = 0;
+  function next(){
+    if(!allPlaying) return;
+    if(i >= visible.length){ stopSpeak(); return; }
+    const c = visible[i];
+    c.el.classList.add('speaking');
+    playText(c.en, ()=>{ c.el.classList.remove('speaking'); i++; next(); });
+  }
+  next();
+});
+
+/* ===== Toast 提示 ===== */
+let toastTimer = null;
+function showToast(msg){
+  let t = document.querySelector('.toast');
+  if(!t){ t = document.createElement('div'); t.className = 'toast'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>
