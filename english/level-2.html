@@ -299,7 +299,9 @@
       <div class="set-row">
         <span class="set-label">朗读模式</span>
         <div class="mode-tabs">
-          <button class="mode-btn active" id="modeOnline">🌐 在线自然语音</button>
+          <button class="mode-btn active" id="modeAuto">☁️ 自动</button>
+          <button class="mode-btn" id="modeYd">🎙️ 通用在线</button>
+          <button class="mode-btn" id="modeEdge">🌐 微软 Neural</button>
           <button class="mode-btn local" id="modeLocal">💻 本地语音</button>
         </div>
       </div>
@@ -313,10 +315,10 @@
         <button class="try-btn" id="tryBtn">🔊 试听</button>
       </div>
       <div class="set-row">
-        <span class="set-hint">💡 在线语音是微软神经网络语音（接近真人），需联网；连不上时会自动改用本地语音</span>
+        <span class="set-hint">💡 自动：电脑用微软 Neural（最自然），iPad/手机用有道真人发音；通用在线全平台可用，连不上自动回退本地</span>
       </div>
       <div class="set-row" id="iosHint" style="display:none;">
-        <span class="set-hint" style="color:#FF6B6B;">📱 当前是 iOS 设备：在线语音连不上，已自动使用系统语音，直接点句子就能听</span>
+        <span class="set-hint" style="color:#FF6B6B;">📱 当前是 iOS 设备：已自动使用「通用在线语音」（有道真人发音），点句子就能听</span>
       </div>
     </div>
     <div class="chips" id="chips"></div>
@@ -334,7 +336,7 @@
 
 <footer>
   <b>儿童英语口语 200 句</b> · 16 大主题 · 点击句子听发音<br>
-  朗读默认使用微软在线自然语音（接近真人），网络不通时自动切换本地语音 💡
+  朗读：电脑默认微软 Neural 真人音，iPad/手机自动用有道真人发音；连不上自动回退本地语音 💡
 </footer>
 
 <script>
@@ -596,14 +598,19 @@ const EDGE_VOICES = [
   {name:'en-GB-RyanNeural',  label:'Ryan 男声 · 英音'}
 ];
 
-let settings = { mode:'online', edgeVoice:'en-US-JennyNeural', localVoice:'', rate:0.9 };
+let settings = { mode:'auto', edgeVoice:'en-US-JennyNeural', localVoice:'', ydAccent:2, rate:0.9 };
 // iOS 检测：iPhone/iPad，以及新版 iPadOS（UA 伪装成 Mac）
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
-if(isIOS) settings.mode = 'local';   // iOS 连不上微软在线语音，强制用系统语音
 try{ const s = JSON.parse(localStorage.getItem('kids200_voice')); if(s) settings = Object.assign(settings, s); }catch(e){}
+if(settings.mode === 'online') settings.mode = 'auto';   // 旧版「在线」设置自动迁移为「自动」
 
 const settingsBtn = $('settingsBtn'), settingsPanel = $('settingsPanel');
-const modeOnline = $('modeOnline'), modeLocal = $('modeLocal');
+const modeAuto = $('modeAuto'), modeYd = $('modeYd'), modeEdge = $('modeEdge'), modeLocal = $('modeLocal');
+// 按已保存设置同步模式按钮高亮
+modeAuto.classList.toggle('active', settings.mode==='auto');
+modeYd.classList.toggle('active', settings.mode==='youdao');
+modeEdge.classList.toggle('active', settings.mode==='edge');
+modeLocal.classList.toggle('active', settings.mode==='local');
 const voiceSelect = $('voiceSelect'), rateRange = $('rateRange'), rateVal = $('rateVal');
 rateRange.value = settings.rate; rateVal.textContent = settings.rate.toFixed(2);
 
@@ -617,7 +624,14 @@ function rankVoice(v){
 }
 function fillVoiceSelect(){
   voiceSelect.innerHTML = '';
-  if(settings.mode === 'online'){
+  if(settings.mode === 'youdao' || (settings.mode === 'auto' && isIOS)){
+    [['2','🇺🇸 美音（默认）'],['1','🇬🇧 英音']].forEach(p=>{
+      const o = document.createElement('option');
+      o.value = p[0]; o.textContent = p[1];
+      if(String(settings.ydAccent||2) === p[0]) o.selected = true;
+      voiceSelect.appendChild(o);
+    });
+  }else if(settings.mode === 'edge' || settings.mode === 'auto'){
     EDGE_VOICES.forEach(v=>{
       const o = document.createElement('option');
       o.value = v.name; o.textContent = v.label;
@@ -641,19 +655,24 @@ function fillVoiceSelect(){
   }
 }
 function setMode(mode){
-  if(isIOS && mode==='online'){ showToast('⚠️ iOS 设备用不了在线语音，已使用系统语音'); return; }
   settings.mode = mode;
-  modeOnline.classList.toggle('active', mode==='online');
+  modeAuto.classList.toggle('active', mode==='auto');
+  modeYd.classList.toggle('active', mode==='youdao');
+  modeEdge.classList.toggle('active', mode==='edge');
   modeLocal.classList.toggle('active', mode==='local');
   fillVoiceSelect(); saveSettings();
 }
 function saveSettings(){
   try{ localStorage.setItem('kids200_voice', JSON.stringify(settings)); }catch(e){}
 }
-modeOnline.addEventListener('click', ()=>setMode('online'));
+modeAuto.addEventListener('click', ()=>setMode('auto'));
+modeYd.addEventListener('click', ()=>setMode('youdao'));
+modeEdge.addEventListener('click', ()=>setMode('edge'));
 modeLocal.addEventListener('click', ()=>setMode('local'));
 voiceSelect.addEventListener('change', ()=>{
-  if(settings.mode==='online') settings.edgeVoice = voiceSelect.value;
+  const m = settings.mode;
+  if(m==='youdao' || (m==='auto' && isIOS)) settings.ydAccent = parseInt(voiceSelect.value)||2;
+  else if(m==='edge' || m==='auto') settings.edgeVoice = voiceSelect.value;
   else settings.localVoice = voiceSelect.value;
   saveSettings();
 });
@@ -772,7 +791,8 @@ function stopSpeak(){
 }
 function playText(text, onDone){
   const token = playToken;
-  if(settings.mode === 'online'){
+  const mode = settings.mode === 'auto' ? (isIOS ? 'youdao' : 'edge') : settings.mode;
+  if(mode === 'edge'){
     edgeSpeak(text).then(url=>{
       if(token !== playToken){ URL.revokeObjectURL(url); return; }
       edgeAudio = new Audio(url);
@@ -780,6 +800,16 @@ function playText(text, onDone){
       edgeAudio.onerror = ()=>{ URL.revokeObjectURL(url); edgeAudio = null; localFallback(text, onDone, token); };
       edgeAudio.play().catch(()=>{ URL.revokeObjectURL(url); edgeAudio = null; localFallback(text, onDone, token); });
     }).catch(()=>localFallback(text, onDone, token));
+  }else if(mode === 'youdao'){
+    const accent = settings.ydAccent || 2;
+    const url = 'https://dict.youdao.com/dictvoice?audio='
+      + encodeURIComponent(text).replace(/%20/g,'+') + '&type=' + accent;
+    if(token !== playToken) return;
+    edgeAudio = new Audio(url);
+    edgeAudio.playbackRate = Math.min(Math.max(settings.rate, 0.5), 1.3);  // 有道接口不支持变速，用播放速率近似
+    edgeAudio.onended = ()=>{ edgeAudio = null; if(token===playToken) onDone(); };
+    edgeAudio.onerror = ()=>{ edgeAudio = null; localFallback(text, onDone, token); };
+    edgeAudio.play().catch(()=>{ edgeAudio = null; localFallback(text, onDone, token); });
   }else{
     localSpeak(text, onDone, token);
   }
